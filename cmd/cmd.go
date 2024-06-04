@@ -4,6 +4,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"slices"
+	"tiger/objects"
 	"tiger/repo"
 )
 
@@ -16,7 +18,7 @@ func Cli() {
 	case "add":
 		//cmd_add(args)
 	case "cat-file":
-		//cmd_cat_file(args)
+		err = cmdCatFile(args)
 	case "check-ignore":
 		//cmd_check_ignore(args)
 	case "checkout":
@@ -60,4 +62,43 @@ func cmdInit(args []string) error {
 
 	_, err := repo.Create(args[0])
 	return err
+}
+
+// cmdCatFile behaves the same as git cat-file.
+func cmdCatFile(args []string) error {
+	if len(args) != 2 {
+		return errors.New("Please provide cat-file TYPE OBJECT")
+	}
+
+	if !slices.Contains([]string{"blob", "commit", "tag", "tree"}, args[0]) {
+		return errors.New("Invalid TYPE, use one of 'blob', 'commit', 'tag' or 'tree'")
+	}
+	
+	objectType := args[0]
+	objectSha := args[1]
+
+	r, err := repo.FindRoot(".", true)
+	if err != nil {
+		return err
+	}
+
+	err = catFile(r, objectSha, objectType)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func catFile(r *repo.Repo, object string, format string) error {
+	foundObject, err := objects.Find(r, object, format, true)
+	newObject, err := objects.Read(r, foundObject)
+
+	objectSha, err := newObject.Serialize()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(objectSha))
+	return nil
 }
