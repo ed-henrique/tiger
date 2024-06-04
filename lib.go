@@ -23,7 +23,7 @@ func newRepository(path string, force bool) (repository, error) {
 	}
 
 	fi, err := os.Stat(repo.gitDir)
-	if !os.IsNotExist(err) {
+	if os.IsNotExist(err) {
 		return repository{}, errors.New(fmt.Sprintf("Not a Git repository %s", path))
 	}
 
@@ -195,4 +195,40 @@ func repoCreate(path string) (repository, error) {
 	}
 
 	return repo, nil
+}
+
+func repoFind(path string, required bool) (repository, error) {
+	if path == "" {
+		path = "."
+	}
+
+	path, err := filepath.Abs(path)
+	if err != nil {
+		return repository{}, err
+	}
+
+	fiGit, err := os.Stat(filepath.Join(path, ".git"))
+	if !os.IsNotExist(err) && fiGit.IsDir() {
+		repo, err := newRepository(path, false)
+		if err != nil {
+			return repository{}, err
+		}
+
+		return repo, nil
+	}
+
+	parent, err := filepath.Abs(filepath.Join(path, ".."))
+	if err != nil {
+		return repository{}, err
+	}
+
+	if parent == path {
+		if required {
+			return repository{}, errors.New("No git directory.")
+		}
+
+		return repository{}, nil
+	}
+
+	return repoFind(parent, required)
 }
