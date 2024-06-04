@@ -1,12 +1,13 @@
-package main
+package cmd
 
 import (
 	"errors"
 	"flag"
 	"fmt"
+	"tiger/repo"
 )
 
-func cli() {
+func Cli() {
 	flag.Parse()
 	args := flag.Args()[1:]
 
@@ -51,11 +52,12 @@ func cli() {
 	}
 }
 
+// cmdInit behaves the same as git init.
 func cmdInit(args []string) error {
 	if len(args) != 1 {
 		return errors.New("Only one path accepted as argument for init")
 	}
 
-	_, err := repoCreate(args[0])
+	_, err := repo.Create(args[0])
 	return err
 }

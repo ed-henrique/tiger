@@ -1,10 +1,10 @@
-GO_FILES := $(shell find . -type f -name "*.go" ! -name "*_test.go" -exec ls {} +)
+GO_FILES := $(shell find . -type f -name "*.go" ! -name "*_test.go")
 
 all: build
 
 build:
 	@echo "Building..."
-	@go build -o bin/main cmd/api/main.go
+	@go build -o bin/main main.go
 
 run:
 	@echo "Running..."

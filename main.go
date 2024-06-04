@@ -1,5 +1,9 @@
 package main
 
+import (
+	"tiger/cmd"
+)
+
 func main() {
-  cli()
+	cmd.Cli()
 }
