@@ -16,35 +16,35 @@ func Cli() {
 	var err error
 	switch flag.Args()[0] {
 	case "add":
-		//cmd_add(args)
+		//cmdAdd(args)
 	case "cat-file":
 		err = cmdCatFile(args)
 	case "check-ignore":
-		//cmd_check_ignore(args)
+		//cmdCheckIgnore(args)
 	case "checkout":
-		//cmd_checkout(args)
+		//cmdCheckout(args)
 	case "commit":
-		//cmd_commit(args)
+		//cmdCommit(args)
 	case "hash-object":
-		//cmd_hash_object(args)
+		//cmdHashObject(args)
 	case "init":
 		err = cmdInit(args)
 	case "log":
-		//cmd_log(args)
+		//cmdLog(args)
 	case "ls-files":
-		//cmd_ls_files(args)
+		//cmdLsFiles(args)
 	case "ls-tree":
-		//cmd_ls_tree(args)
+		//cmdLsTree(args)
 	case "rev-parse":
-		//cmd_rev_parse(args)
+		//cmdRevParse(args)
 	case "rm":
-		//cmd_rm(args)
+		//cmdRm(args)
 	case "show-ref":
-		//cmd_show_ref(args)
+		//cmdShowRef(args)
 	case "status":
-		//cmd_status(args)
+		//cmdStatus(args)
 	case "tag":
-		//cmd_tag(args)
+		//cmdTag(args)
 	default:
 		fmt.Println("Bad command")
 	}
@@ -56,18 +56,22 @@ func Cli() {
 
 // cmdInit behaves the same as git init.
 func cmdInit(args []string) error {
-	if len(args) != 1 {
-		return errors.New("Only one path accepted as argument for init")
+	switch len(args) {
+	case 0:
+		_, err := repo.Create(".")
+		return err
+	case 1:
+		_, err := repo.Create(args[0])
+		return err
+	default:
+		return errors.New("init [path]")
 	}
-
-	_, err := repo.Create(args[0])
-	return err
 }
 
 // cmdCatFile behaves the same as git cat-file.
 func cmdCatFile(args []string) error {
 	if len(args) != 2 {
-		return errors.New("Please provide cat-file TYPE OBJECT")
+		return errors.New("cat-file TYPE OBJECT")
 	}
 
 	if !slices.Contains([]string{"blob", "commit", "tag", "tree"}, args[0]) {
